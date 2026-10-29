@@ -1,1025 +1,1301 @@
-CODE-DOC
-Campus Reachability and Emergency Route Audit
-Using Recursive DFS and BFS in Python
-Submitted By
-Name: Kanuri Thanush
-
-Roll Number: 25MVCAIR0059
-
-Course: MCA
-
-Language Used: Python 3
-Problem Statement
-The objective of this project is to develop a graph-based campus auditing system that analyzes the connectivity of different areas within a campus. The campus consists of several locations represented as vertices, while the walkways connecting these locations are represented as undirected edges.
-
-The application performs three major operations:
-1. Identify all connected components using Recursive Depth First Search (DFS).
-2. Perform DFS and BFS traversals from a given emergency station (source vertex).
-3. Find the shortest route from the emergency station to requested destination vertices using the Breadth First Search parent array.
-The program must always process neighbouring vertices in increasing numerical order so that every execution produces the same output regardless of the order in which edges are entered.
-Objective
-The main objectives of this project are:
-- To represent a campus as an undirected graph.
-- To identify every connected component of the graph.
-- To assign every vertex the smallest numbered vertex of its connected component.
-- To perform Recursive DFS traversal.
-- To perform Queue-based BFS traversal.
-- To compute minimum-edge routes using BFS.
-- To print unreachable destinations when no path exists.
-- To produce deterministic outputs by sorting adjacency lists.
-Introduction
-Graphs are one of the most important data structures used in computer science. Many real-world problems such as road navigation, computer networks, social networks, transportation systems, and campus maps can be represented using graphs.
-
-In this project, every building or location inside the campus is represented as a vertex, while every walkway connecting two buildings is represented as an edge.
-
-Example:
-Academic Block ----- Library
-        |
-        |
-Computer Lab ----- Cafeteria
-
-Hostel ----- Playground
-
-This graph contains two connected areas.
-
-The first connected area contains:
-Academic Block
-Library
-Computer Lab
-Cafeteria
-
-The second connected area contains:
-Hostel
-Playground
-
-The program automatically detects these connected areas and labels them.
-Concepts Used
-The project uses the following graph concepts:
-1. Graph
-A graph consists of vertices and edges.
-
-Example
-0 ----- 1
-|       |
-|       |
-2 ----- 3
-
-Vertices:
-0 1 2 3
-
-Edges:
-0-1
-0-2
-1-3
-2-3
-
-2. Adjacency List
-Instead of storing the graph as a matrix, an adjacency list is used.
-
-Example:
-0 → 1 2
-
-1 → 0 3
-
-2 → 0 3
-
-3 → 1 2
-
-Advantages:
-- Less memory usage.
-- Faster traversal.
-- Easy to store sparse graphs.
-3. Connected Component
-A connected component is a group of vertices where every vertex can be reached from every other vertex.
-
-Example
-0 ----- 1
-
-|       |
-
-2 ----- 3
-
-
-4 ----- 5
-
-Connected Components:
-
-Component 1
-0
-1
-2
-3
-
-Component 2
-4
-5
-
-Total Components:
-2
-
-4. Depth First Search (DFS)
-Depth First Search explores one path completely before backtracking.
-
-Example
-0
-|
-1
-|
-3
-|
-2
-
-DFS Order:
-0 1 3 2
-
-The project uses Recursive DFS.
-5. Breadth First Search (BFS)
-Breadth First Search explores level by level.
-
-Example
-      0
-    /   \
-   1     2
-    \   /
-      3
-
-Traversal
-Level 0
-
-0
-
-↓
-
-Level 1
-
-1 2
-
-↓
-
-Level 2
-
-3
-
-BFS Order
-0 1 2 3
-
-6. Parent Array
-During BFS, every newly discovered vertex stores the vertex from which it was discovered.
-
-Example
-parent[1]=0
-
-parent[2]=0
-
-parent[3]=1
-
-Parent Array
-Vertex
-
-0 1 2 3
-
-Parent
-
--1 0 0 1
-
-7. Distance Array
-The distance array stores the minimum number of edges from the source.
-
-Example
-Source = 0
-
-Distance Array
-Vertex
-
-0 1 2 3
-
-Distance
-
-0 1 1 2
-
-This information is later used to print the shortest routes.
-Software Requirements
-- Operating System: Windows 10/11, Linux, or macOS
-- Programming Language: Python 3
-- IDE: Visual Studio Code (VS Code)
-- Python Version: Python 3.10 or above
-
-Part 2: Algorithm and Code Explanation
-Algorithm
-The program is divided into five major stages.
-Step 1: Read the Input
-The program first reads:
-- Number of vertices (n)
-- Number of edges (m)
-- Every edge of the graph
-- Source vertex (s)
-- Number of route queries (q)
-- Target vertices
-The graph is stored using an adjacency list.
-
-Example
-6 5
-0 2
-0 1
-1 3
-2 3
-4 5
-
-Adjacency List
-0 → 1 2
-
-1 → 0 3
-
-2 → 0 3
-
-3 → 1 2
-
-4 → 5
-
-5 → 4
-
-After reading all edges, every adjacency list is sorted.
-
-Sorting guarantees that neighbours are always visited in increasing numerical order.
-Step 2: Find Connected Components
-The program performs Recursive DFS over the whole graph.
-
-Algorithm:
-Mark all vertices as unvisited
-
-For every vertex
-
-    if vertex is not visited
-
-        start Recursive DFS
-
-        label every reachable vertex
-
-        increase component count
-
-Suppose the graph is
-0 ----- 1
-|       |
-|       |
-2 ----- 3
-
-4 ----- 5
-
-DFS starting from
-0
-
-visits
-0
-1
-3
-2
-
-All these vertices receive label
-0
-
-Next DFS starts from
-4
-
-visits
-4
-5
-
-Both receive label
-4
-
-Finally
-Labels
-
-0 0 0 0 4 4
-
-Number of Components
-2
-
-Step 3: Perform DFS Traversal
-A second Recursive DFS is performed only from the given source.
-
-Purpose
-- Explore only the source component.
-- Record visiting order.
-Algorithm
-Visit source
-
-Record source
-
-Visit every neighbour recursively
-
-Continue until no neighbour remains
-
-Example
-      0
-     / \
-    1   2
-     \ /
-      3
-
-Traversal
-0
-
-↓
-
-1
-
-↓
-
-3
-
-↓
-
-2
-
-Output
-DFS
-
-0 1 3 2
-
-The vertex is recorded immediately after entering it.
-Step 4: Perform BFS Traversal
-Breadth First Search uses a Queue.
-
-Algorithm
-Insert source into queue
-
-Mark source visited
-
-While queue is not empty
-
-    Remove front vertex
-
-    Record it
-
-    Visit every neighbour
-
-    Mark neighbour visited
-
-    Save parent
-
-    Save distance
-
-    Insert neighbour
-
-Example
-Queue
-
-0
-
-Remove
-0
-
-Insert
-1
-2
-
-Queue
-1 2
-
-Remove
-1
-
-Insert
-3
-
-Queue
-2 3
-
-Remove
-2
-
-Queue
-3
-
-Remove
-3
-
-Traversal
-0 1 2 3
-
-Step 5: Build Shortest Route
-The program never runs another shortest-path algorithm.
-
-Instead it uses the Parent Array produced during BFS.
-
-Example
-
-Parent Array
-Vertex
-
-0 1 2 3
-
-Parent
-
--1 0 0 1
-
-Target
-3
-
-Trace backwards
-3
-
-↑
-
-1
-
-↑
-
-0
-
-Reverse
-0 1 3
-
-Distance
-2
-
-Output
-ROUTE 3 2 0 1 3
-
-Overall Algorithm
-Read Input
-
-↓
-
-Create Adjacency List
-
-↓
-
-Sort Every Neighbour List
-
-↓
-
-Recursive DFS
-Find Connected Components
-
-↓
-
-Print Components
-
-↓
-
-Recursive DFS
-From Source
-
-↓
-
-Print DFS Order
-
-↓
-
-Queue Based BFS
-
-↓
-
-Store Parent Array
-
-↓
-
-Store Distance Array
-
-↓
-
-Answer Queries
-
-↓
-
-Print Routes
-
-Detailed Code Explanation
-Import Statements
-import sysfrom collections import deque
-
-
-Purpose
-sys
-
-Used to read complete input efficiently.
-
-deque
-
-Used as a queue during BFS.
-Reading Input
-data = sys.stdin.read().split()
-
-
-Explanation
-Reads every value from standard input.
-
-Example Input
-6 5
-0 2
-0 1
-
-becomes
-['6','5','0','2','0','1']
-
-
-Creating Adjacency List
-adj = [[] for _ in range(n)]
-
-
-Creates one empty list for every vertex.
-
-Example
-n = 4
-
-Creates
-[[],[],[],[]]
-
-
-Reading Every Edge
-adj[u].append(v)adj[v].append(u)
-
-
-Because the graph is undirected.
-
-Example
-
-Edge
-0 2
-
-becomes
-0 → 2
-
-2 → 0
-
-Sorting the Adjacency List
-for lst in adj:    lst.sort()
-
-
-Example
-
-Before
-0
-
-2 1
-
-After
-0
-
-1 2
-
-Sorting makes DFS and BFS deterministic.
-Connected Component Variables
-label = [-1]*nvisited = [False]*ncomponents = 0
-
-
-Purpose
-
-label
-
-Stores component number.
-
-visited
-
-Checks whether vertex has already been explored.
-
-components
-
-Counts total connected components.
-Recursive DFS Function
-def label_dfs(u, comp_id):
-
-
-Parameters
-u
-
-Current vertex
-
-comp_id
-
-Smallest vertex of component
-
-Inside function
-visited[u]=Truelabel[u]=comp_id
-
-
-Marks vertex visited and assigns label.
-Finding Connected Components
-for v in range(n):
-
-
-Starts DFS from the smallest unvisited vertex.
-
-Example
-0
-
-↓
-
-DFS
-
-↓
-
-4
-
-↓
-
-DFS
-
-Produces
-2 Components
-
-DFS Traversal
-dfs_order=[]
-
-
-Stores DFS visiting order.
-
-Example
-0
-
-↓
-
-1
-
-↓
-
-3
-
-↓
-
-2
-
-Stored as
-0 1 3 2
-
-BFS Variables
-dist=[]parent=[]queue
-
-
-Purpose
-
-dist
-
-Stores minimum distance from source.
-
-parent
-
-Stores previous vertex.
-
-queue
-
-Controls BFS order.
-Distance Array
-Example
-Source = 0
-
-Distance
-Vertex
-
-0 1 2 3
-
-Distance
-
-0 1 1 2
-
-Parent Array
-Example
-Vertex
-
-0 1 2 3
-
-Parent
-
--1 0 0 1
-
-Meaning
-3 discovered from 1
-
-1 discovered from 0
-
-Route Reconstruction
-Algorithm
-Target
-
-↓
-
-Follow Parent
-
-↓
-
-Reach Source
-
-↓
-
-Reverse List
-
-↓
-
-Print Path
-
-Example
-3
-
-↓
-
-1
-
-↓
-
-0
-
-Reverse
-0 1 3
-
-Output Section
-The program prints:
-COMPONENTS
-
-↓
-
-LABELS
-
-↓
-
-DFS
-
-↓
-
-BFS
-
-↓
-
-ROUTE
-
-Exactly in the format required by the assignment specification.
-
-Time Complexity Analysis
-The efficiency of the program depends on the graph traversal algorithms used. Both Depth First Search (DFS) and Breadth First Search (BFS) are efficient graph traversal techniques.
-1. Building the Graph
-The program reads all the edges and stores them in an adjacency list.
-adj[u].append(v)adj[v].append(u)
-
-
-There are m edges.
-
-Time Complexity
-\[
-O(m)
-\]
-where
-- n = Number of vertices
-- m = Number of edges
-2. Sorting the Adjacency List
-Every adjacency list is sorted.
-for lst in adj:    lst.sort()
-
-
-Sorting guarantees neighbours are visited in increasing order.
-
-Worst-case complexity
-\[
-O(m\log n)
-\]
-3. Connected Component DFS
-Every vertex is visited exactly once.
-
-Every edge is also visited once.
-
-Time Complexity
-\[
-O(n+m)
-\]
-4. DFS Traversal
-The DFS traversal starts only from the source vertex.
-
-Every reachable vertex is visited once.
-
-Time Complexity
-\[
-O(n+m)
-\]
-5. BFS Traversal
-Breadth First Search also visits every reachable vertex only once.
-
-Each edge is examined only once.
-
-Time Complexity
-\[
-O(n+m)
-\]
-6. Route Reconstruction
-For every query, the program follows the parent array.
-
-If the route contains k vertices
-
-Time Complexity
-\[
-O(k)
-\]
-Worst case
-\[
-O(n)
-\]
-Overall Time Complexity
-The complete program executes in
-\[
-O(m\log n)+O(n+m)
-\]
-which is commonly written as
-\[
-\boxed{O(m\log n+n+m)}
-\]
-Since the maximum number of vertices is only 200, the program executes very quickly.
-Space Complexity
-The program stores several arrays.
-Data Structure	Space
-Adjacency List	O(n+m)
-Visited Array	O(n)
-Label Array	O(n)
-Parent Array	O(n)
-Distance Array	O(n)
-Queue	O(n)
-DFS Order	O(n)
-BFS Order	O(n)
-
-
-Total Space Complexity
-\[
-\boxed{O(n+m)}
-\]
-Test Case 1 (Original)
-Input
-5 4
-0 1
-1 2
-2 3
-3 4
-0 2
-4
-2
-
-Expected Output
-COMPONENTS 1
-LABELS 0 0 0 0 0
-DFS 0 1 2 3 4
-BFS 0 1 2 3 4
-ROUTE 4 4 0 1 2 3 4
-ROUTE 2 2 0 1 2
-
-Explanation
-All five vertices belong to one connected component.
-
-DFS visits every vertex recursively.
-
-BFS finds the shortest route.
-
-The route to vertex 4 contains four edges.
-Test Case 2 (Original)
-Input
-7 4
-0 1
-1 2
-3 4
-5 6
-0 3
-2
-5
-
-Expected Output
-COMPONENTS 3
-LABELS 0 0 0 3 3 5 5
-DFS 0 1 2
-BFS 0 1 2
-ROUTE 3 UNREACHABLE
-ROUTE 5 UNREACHABLE
-
-Explanation
-The graph contains three connected components.
-0-1-2
-
-3-4
-
-5-6
-
-Source vertex is 0.
-
-Vertices 3 and 5 belong to different components.
-
-Therefore they are unreachable.
-Test Case 3 (Original)
-Input
-6 6
-0 1
-0 2
-1 3
-2 4
-3 5
-4 5
-0 3
-5
-4
-0
-
-Expected Output
-COMPONENTS 1
-LABELS 0 0 0 0 0 0
-DFS 0 1 3 5 4 2
-BFS 0 1 2 3 4 5
-ROUTE 5 3 0 1 3 5
-ROUTE 4 2 0 2 4
-ROUTE 0 0 0
-
-Explanation
-Only one connected component exists.
-
-DFS explores one branch completely before backtracking.
-
-BFS explores level by level.
-
-The shortest path to vertex 5 is
-0 → 1 → 3 → 5
-
-Sample Test Case 1
-Input
-6 5
-0 2
-0 1
-1 3
-2 3
-4 5
-0 3
-3
-5
-0
-
-Expected Output
-COMPONENTS 2
-LABELS 0 0 0 0 4 4
-DFS 0 1 3 2
-BFS 0 1 2 3
-ROUTE 3 2 0 1 3
-ROUTE 5 UNREACHABLE
-ROUTE 0 0 0
-
-Explanation
-The graph has two connected components.
-0-1
-| |
-2-3
-
-4-5
-
-DFS visits
-0
-↓
-
-1
-↓
-
-3
-↓
-
-2
-
-BFS visits
-0
-
-↓
-
-1 2
-
-↓
-
-3
-
-Vertex 5 belongs to another connected component.
-
-Therefore it is unreachable.
-Sample Test Case 2
-Input
-3 0
-1 2
-1
-0
-
-Expected Output
-COMPONENTS 3
-LABELS 0 1 2
-DFS 1
-BFS 1
-ROUTE 1 0 1
-ROUTE 0 UNREACHABLE
-
-Explanation
-No edges exist.
-
-Every vertex forms its own connected component.
-
-DFS and BFS both visit only the source vertex.
-Conclusion
-This project successfully demonstrates the implementation of graph traversal algorithms using Recursive Depth First Search (DFS) and Breadth First Search (BFS). The program identifies all connected components in the graph, labels each vertex with the smallest vertex number in its connected component, performs deterministic DFS and BFS traversals, and reconstructs minimum-edge routes using the BFS parent array.
-
-By sorting adjacency lists before traversal, the output remains consistent and reproducible regardless of the order in which edges are provided. The project also highlights the practical use of graphs in representing campus walkways and emergency navigation systems. Overall, the implementation satisfies all the requirements specified in the problem statement while maintaining efficient time and space complexity
-
-Team Members Contribution
-Name	Roll Number	Role	Contribution
-Kanuri Thanush	25MVCAIR0059	
-Team Leader	Led the project, designed the overall algorithm, implemented the Python program using Recursive DFS and BFS, integrated all modules, tested the application with different test cases, analyzed time and space complexity, debugged the code, and prepared the complete project documentation (CODE-DOC).
-Ramagiri Manish	25MVCAIR0069	
-Team Member	Assisted in understanding the problem statement, contributed to testing the program with sample and custom test cases, verified the correctness of outputs, and participated in documentation review.
-Challa Bharat	25MVCAIR0020	
-Team Member	Assisted in graph analysis, verified DFS and BFS traversal results, helped identify edge cases, and supported testing and validation of the implementation.
-Devata Sai Nihar	25MVCAIR0030	
-Team Member	Contributed to requirement analysis, checked algorithm flow, assisted in preparing test cases and validating the final outputs, and reviewed the documentation before submission.
+%PDF-1.4
+%����
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R 24 0 R 26 0 R 28 0 R 30 0 R 32 0 R 34 0 R 36 0 R 38 0 R 40 0 R] /Count 19 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 2665 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(CODE-DOC) Tj T*
+(Campus Reachability and Emergency Route Audit) Tj T*
+(Using Recursive DFS and BFS in Python) Tj T*
+(Submitted By) Tj T*
+(Name: Kanuri Thanush) Tj T*
+() Tj T*
+(Roll Number: 25MVCAIR0059) Tj T*
+() Tj T*
+(Course: MCA) Tj T*
+() Tj T*
+(Language Used: Python 3) Tj T*
+(Problem Statement) Tj T*
+(The objective of this project is to develop a graph-based campus auditing system that) Tj T*
+(analyzes the connectivity of different areas within a campus. The campus consists of several) Tj T*
+(locations represented as vertices, while the walkways connecting these locations are) Tj T*
+(represented as undirected edges.) Tj T*
+() Tj T*
+(The application performs three major operations:) Tj T*
+(1. Identify all connected components using Recursive Depth First Search \(DFS\).) Tj T*
+(2. Perform DFS and BFS traversals from a given emergency station \(source vertex\).) Tj T*
+(3. Find the shortest route from the emergency station to requested destination vertices) Tj T*
+(using the Breadth First Search parent array.) Tj T*
+(The program must always process neighbouring vertices in increasing numerical order so that) Tj T*
+(every execution produces the same output regardless of the order in which edges are entered.) Tj T*
+(Objective) Tj T*
+(The main objectives of this project are:) Tj T*
+(- To represent a campus as an undirected graph.) Tj T*
+(- To identify every connected component of the graph.) Tj T*
+(- To assign every vertex the smallest numbered vertex of its connected component.) Tj T*
+(- To perform Recursive DFS traversal.) Tj T*
+(- To perform Queue-based BFS traversal.) Tj T*
+(- To compute minimum-edge routes using BFS.) Tj T*
+(- To print unreachable destinations when no path exists.) Tj T*
+(- To produce deterministic outputs by sorting adjacency lists.) Tj T*
+(Introduction) Tj T*
+(Graphs are one of the most important data structures used in computer science. Many) Tj T*
+(real-world problems such as road navigation, computer networks, social networks,) Tj T*
+(transportation systems, and campus maps can be represented using graphs.) Tj T*
+() Tj T*
+(In this project, every building or location inside the campus is represented as a vertex,) Tj T*
+(while every walkway connecting two buildings is represented as an edge.) Tj T*
+() Tj T*
+(Example:) Tj T*
+(Academic Block ----- Library) Tj T*
+(        |) Tj T*
+(        |) Tj T*
+(Computer Lab ----- Cafeteria) Tj T*
+() Tj T*
+(Hostel ----- Playground) Tj T*
+() Tj T*
+(This graph contains two connected areas.) Tj T*
+() Tj T*
+(The first connected area contains:) Tj T*
+(Academic Block) Tj T*
+(Library) Tj T*
+(Computer Lab) Tj T*
+(Cafeteria) Tj T*
+() Tj T*
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 1264 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(The second connected area contains:) Tj T*
+(Hostel) Tj T*
+(Playground) Tj T*
+() Tj T*
+(The program automatically detects these connected areas and labels them.) Tj T*
+(Concepts Used) Tj T*
+(The project uses the following graph concepts:) Tj T*
+(1. Graph) Tj T*
+(A graph consists of vertices and edges.) Tj T*
+() Tj T*
+(Example) Tj T*
+(0 ----- 1) Tj T*
+(|       |) Tj T*
+(|       |) Tj T*
+(2 ----- 3) Tj T*
+() Tj T*
+(Vertices:) Tj T*
+(0 1 2 3) Tj T*
+() Tj T*
+(Edges:) Tj T*
+(0-1) Tj T*
+(0-2) Tj T*
+(1-3) Tj T*
+(2-3) Tj T*
+() Tj T*
+(2. Adjacency List) Tj T*
+(Instead of storing the graph as a matrix, an adjacency list is used.) Tj T*
+() Tj T*
+(Example:) Tj T*
+(0 -> 1 2) Tj T*
+() Tj T*
+(1 -> 0 3) Tj T*
+() Tj T*
+(2 -> 0 3) Tj T*
+() Tj T*
+(3 -> 1 2) Tj T*
+() Tj T*
+(Advantages:) Tj T*
+(- Less memory usage.) Tj T*
+(- Faster traversal.) Tj T*
+(- Easy to store sparse graphs.) Tj T*
+(3. Connected Component) Tj T*
+(A connected component is a group of vertices where every vertex can be reached from every) Tj T*
+(other vertex.) Tj T*
+() Tj T*
+(Example) Tj T*
+(0 ----- 1) Tj T*
+() Tj T*
+(|       |) Tj T*
+() Tj T*
+(2 ----- 3) Tj T*
+() Tj T*
+() Tj T*
+(4 ----- 5) Tj T*
+() Tj T*
+(Connected Components:) Tj T*
+() Tj T*
+(Component 1) Tj T*
+ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 928 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(0) Tj T*
+(1) Tj T*
+(2) Tj T*
+(3) Tj T*
+() Tj T*
+(Component 2) Tj T*
+(4) Tj T*
+(5) Tj T*
+() Tj T*
+(Total Components:) Tj T*
+(2) Tj T*
+() Tj T*
+(4. Depth First Search \(DFS\)) Tj T*
+(Depth First Search explores one path completely before backtracking.) Tj T*
+() Tj T*
+(Example) Tj T*
+(0) Tj T*
+(|) Tj T*
+(1) Tj T*
+(|) Tj T*
+(3) Tj T*
+(|) Tj T*
+(2) Tj T*
+() Tj T*
+(DFS Order:) Tj T*
+(0 1 3 2) Tj T*
+() Tj T*
+(The project uses Recursive DFS.) Tj T*
+(5. Breadth First Search \(BFS\)) Tj T*
+(Breadth First Search explores level by level.) Tj T*
+() Tj T*
+(Example) Tj T*
+(      0) Tj T*
+(    /   \\) Tj T*
+(   1     2) Tj T*
+(    \\   /) Tj T*
+(      3) Tj T*
+() Tj T*
+(Traversal) Tj T*
+(Level 0) Tj T*
+() Tj T*
+(0) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Level 1) Tj T*
+() Tj T*
+(1 2) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Level 2) Tj T*
+() Tj T*
+(3) Tj T*
+() Tj T*
+(BFS Order) Tj T*
+(0 1 2 3) Tj T*
+() Tj T*
+ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 11 0 R >>
+endobj
+11 0 obj
+<< /Length 1463 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(6. Parent Array) Tj T*
+(During BFS, every newly discovered vertex stores the vertex from which it was discovered.) Tj T*
+() Tj T*
+(Example) Tj T*
+(parent[1]=0) Tj T*
+() Tj T*
+(parent[2]=0) Tj T*
+() Tj T*
+(parent[3]=1) Tj T*
+() Tj T*
+(Parent Array) Tj T*
+(Vertex) Tj T*
+() Tj T*
+(0 1 2 3) Tj T*
+() Tj T*
+(Parent) Tj T*
+() Tj T*
+(-1 0 0 1) Tj T*
+() Tj T*
+(7. Distance Array) Tj T*
+(The distance array stores the minimum number of edges from the source.) Tj T*
+() Tj T*
+(Example) Tj T*
+(Source = 0) Tj T*
+() Tj T*
+(Distance Array) Tj T*
+(Vertex) Tj T*
+() Tj T*
+(0 1 2 3) Tj T*
+() Tj T*
+(Distance) Tj T*
+() Tj T*
+(0 1 1 2) Tj T*
+() Tj T*
+(This information is later used to print the shortest routes.) Tj T*
+(Software Requirements) Tj T*
+(- Operating System: Windows 10/11, Linux, or macOS) Tj T*
+(- Programming Language: Python 3) Tj T*
+(- IDE: Visual Studio Code \(VS Code\)) Tj T*
+(- Python Version: Python 3.10 or above) Tj T*
+() Tj T*
+(Part 2: Algorithm and Code Explanation) Tj T*
+(Algorithm) Tj T*
+(The program is divided into five major stages.) Tj T*
+(Step 1: Read the Input) Tj T*
+(The program first reads:) Tj T*
+(- Number of vertices \(n\)) Tj T*
+(- Number of edges \(m\)) Tj T*
+(- Every edge of the graph) Tj T*
+(- Source vertex \(s\)) Tj T*
+(- Number of route queries \(q\)) Tj T*
+(- Target vertices) Tj T*
+(The graph is stored using an adjacency list.) Tj T*
+() Tj T*
+(Example) Tj T*
+(6 5) Tj T*
+(0 2) Tj T*
+(0 1) Tj T*
+ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 13 0 R >>
+endobj
+13 0 obj
+<< /Length 1176 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(1 3) Tj T*
+(2 3) Tj T*
+(4 5) Tj T*
+() Tj T*
+(Adjacency List) Tj T*
+(0 -> 1 2) Tj T*
+() Tj T*
+(1 -> 0 3) Tj T*
+() Tj T*
+(2 -> 0 3) Tj T*
+() Tj T*
+(3 -> 1 2) Tj T*
+() Tj T*
+(4 -> 5) Tj T*
+() Tj T*
+(5 -> 4) Tj T*
+() Tj T*
+(After reading all edges, every adjacency list is sorted.) Tj T*
+() Tj T*
+(Sorting guarantees that neighbours are always visited in increasing numerical order.) Tj T*
+(Step 2: Find Connected Components) Tj T*
+(The program performs Recursive DFS over the whole graph.) Tj T*
+() Tj T*
+(Algorithm:) Tj T*
+(Mark all vertices as unvisited) Tj T*
+() Tj T*
+(For every vertex) Tj T*
+() Tj T*
+(    if vertex is not visited) Tj T*
+() Tj T*
+(        start Recursive DFS) Tj T*
+() Tj T*
+(        label every reachable vertex) Tj T*
+() Tj T*
+(        increase component count) Tj T*
+() Tj T*
+(Suppose the graph is) Tj T*
+(0 ----- 1) Tj T*
+(|       |) Tj T*
+(|       |) Tj T*
+(2 ----- 3) Tj T*
+() Tj T*
+(4 ----- 5) Tj T*
+() Tj T*
+(DFS starting from) Tj T*
+(0) Tj T*
+() Tj T*
+(visits) Tj T*
+(0) Tj T*
+(1) Tj T*
+(3) Tj T*
+(2) Tj T*
+() Tj T*
+(All these vertices receive label) Tj T*
+(0) Tj T*
+() Tj T*
+(Next DFS starts from) Tj T*
+(4) Tj T*
+ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 15 0 R >>
+endobj
+15 0 obj
+<< /Length 967 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+() Tj T*
+(visits) Tj T*
+(4) Tj T*
+(5) Tj T*
+() Tj T*
+(Both receive label) Tj T*
+(4) Tj T*
+() Tj T*
+(Finally) Tj T*
+(Labels) Tj T*
+() Tj T*
+(0 0 0 0 4 4) Tj T*
+() Tj T*
+(Number of Components) Tj T*
+(2) Tj T*
+() Tj T*
+(Step 3: Perform DFS Traversal) Tj T*
+(A second Recursive DFS is performed only from the given source.) Tj T*
+() Tj T*
+(Purpose) Tj T*
+(- Explore only the source component.) Tj T*
+(- Record visiting order.) Tj T*
+(Algorithm) Tj T*
+(Visit source) Tj T*
+() Tj T*
+(Record source) Tj T*
+() Tj T*
+(Visit every neighbour recursively) Tj T*
+() Tj T*
+(Continue until no neighbour remains) Tj T*
+() Tj T*
+(Example) Tj T*
+(      0) Tj T*
+(     / \\) Tj T*
+(    1   2) Tj T*
+(     \\ /) Tj T*
+(      3) Tj T*
+() Tj T*
+(Traversal) Tj T*
+(0) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(1) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(3) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(2) Tj T*
+() Tj T*
+(Output) Tj T*
+(DFS) Tj T*
+() Tj T*
+(0 1 3 2) Tj T*
+() Tj T*
+ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 17 0 R >>
+endobj
+17 0 obj
+<< /Length 963 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(The vertex is recorded immediately after entering it.) Tj T*
+(Step 4: Perform BFS Traversal) Tj T*
+(Breadth First Search uses a Queue.) Tj T*
+() Tj T*
+(Algorithm) Tj T*
+(Insert source into queue) Tj T*
+() Tj T*
+(Mark source visited) Tj T*
+() Tj T*
+(While queue is not empty) Tj T*
+() Tj T*
+(    Remove front vertex) Tj T*
+() Tj T*
+(    Record it) Tj T*
+() Tj T*
+(    Visit every neighbour) Tj T*
+() Tj T*
+(    Mark neighbour visited) Tj T*
+() Tj T*
+(    Save parent) Tj T*
+() Tj T*
+(    Save distance) Tj T*
+() Tj T*
+(    Insert neighbour) Tj T*
+() Tj T*
+(Example) Tj T*
+(Queue) Tj T*
+() Tj T*
+(0) Tj T*
+() Tj T*
+(Remove) Tj T*
+(0) Tj T*
+() Tj T*
+(Insert) Tj T*
+(1) Tj T*
+(2) Tj T*
+() Tj T*
+(Queue) Tj T*
+(1 2) Tj T*
+() Tj T*
+(Remove) Tj T*
+(1) Tj T*
+() Tj T*
+(Insert) Tj T*
+(3) Tj T*
+() Tj T*
+(Queue) Tj T*
+(2 3) Tj T*
+() Tj T*
+(Remove) Tj T*
+(2) Tj T*
+() Tj T*
+(Queue) Tj T*
+(3) Tj T*
+() Tj T*
+(Remove) Tj T*
+(3) Tj T*
+() Tj T*
+ET
+endstream
+endobj
+18 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 19 0 R >>
+endobj
+19 0 obj
+<< /Length 935 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(Traversal) Tj T*
+(0 1 2 3) Tj T*
+() Tj T*
+(Step 5: Build Shortest Route) Tj T*
+(The program never runs another shortest-path algorithm.) Tj T*
+() Tj T*
+(Instead it uses the Parent Array produced during BFS.) Tj T*
+() Tj T*
+(Example) Tj T*
+() Tj T*
+(Parent Array) Tj T*
+(Vertex) Tj T*
+() Tj T*
+(0 1 2 3) Tj T*
+() Tj T*
+(Parent) Tj T*
+() Tj T*
+(-1 0 0 1) Tj T*
+() Tj T*
+(Target) Tj T*
+(3) Tj T*
+() Tj T*
+(Trace backwards) Tj T*
+(3) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(1) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(0) Tj T*
+() Tj T*
+(Reverse) Tj T*
+(0 1 3) Tj T*
+() Tj T*
+(Distance) Tj T*
+(2) Tj T*
+() Tj T*
+(Output) Tj T*
+(ROUTE 3 2 0 1 3) Tj T*
+() Tj T*
+(Overall Algorithm) Tj T*
+(Read Input) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Create Adjacency List) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Sort Every Neighbour List) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Recursive DFS) Tj T*
+(Find Connected Components) Tj T*
+() Tj T*
+ET
+endstream
+endobj
+20 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 21 0 R >>
+endobj
+21 0 obj
+<< /Length 978 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(?) Tj T*
+() Tj T*
+(Print Components) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Recursive DFS) Tj T*
+(From Source) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Print DFS Order) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Queue Based BFS) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Store Parent Array) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Store Distance Array) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Answer Queries) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Print Routes) Tj T*
+() Tj T*
+(Detailed Code Explanation) Tj T*
+(Import Statements) Tj T*
+(import sysfrom collections import deque) Tj T*
+() Tj T*
+() Tj T*
+(Purpose) Tj T*
+(sys) Tj T*
+() Tj T*
+(Used to read complete input efficiently.) Tj T*
+() Tj T*
+(deque) Tj T*
+() Tj T*
+(Used as a queue during BFS.) Tj T*
+(Reading Input) Tj T*
+(data = sys.stdin.read\(\).split\(\)) Tj T*
+() Tj T*
+() Tj T*
+(Explanation) Tj T*
+(Reads every value from standard input.) Tj T*
+() Tj T*
+(Example Input) Tj T*
+(6 5) Tj T*
+(0 2) Tj T*
+(0 1) Tj T*
+() Tj T*
+ET
+endstream
+endobj
+22 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 23 0 R >>
+endobj
+23 0 obj
+<< /Length 1041 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(becomes) Tj T*
+(['6','5','0','2','0','1']) Tj T*
+() Tj T*
+() Tj T*
+(Creating Adjacency List) Tj T*
+(adj = [[] for _ in range\(n\)]) Tj T*
+() Tj T*
+() Tj T*
+(Creates one empty list for every vertex.) Tj T*
+() Tj T*
+(Example) Tj T*
+(n = 4) Tj T*
+() Tj T*
+(Creates) Tj T*
+([[],[],[],[]]) Tj T*
+() Tj T*
+() Tj T*
+(Reading Every Edge) Tj T*
+(adj[u].append\(v\)adj[v].append\(u\)) Tj T*
+() Tj T*
+() Tj T*
+(Because the graph is undirected.) Tj T*
+() Tj T*
+(Example) Tj T*
+() Tj T*
+(Edge) Tj T*
+(0 2) Tj T*
+() Tj T*
+(becomes) Tj T*
+(0 -> 2) Tj T*
+() Tj T*
+(2 -> 0) Tj T*
+() Tj T*
+(Sorting the Adjacency List) Tj T*
+(for lst in adj:    lst.sort\(\)) Tj T*
+() Tj T*
+() Tj T*
+(Example) Tj T*
+() Tj T*
+(Before) Tj T*
+(0) Tj T*
+() Tj T*
+(2 1) Tj T*
+() Tj T*
+(After) Tj T*
+(0) Tj T*
+() Tj T*
+(1 2) Tj T*
+() Tj T*
+(Sorting makes DFS and BFS deterministic.) Tj T*
+(Connected Component Variables) Tj T*
+(label = [-1]*nvisited = [False]*ncomponents = 0) Tj T*
+() Tj T*
+() Tj T*
+(Purpose) Tj T*
+() Tj T*
+(label) Tj T*
+() Tj T*
+ET
+endstream
+endobj
+24 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 25 0 R >>
+endobj
+25 0 obj
+<< /Length 1062 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(Stores component number.) Tj T*
+() Tj T*
+(visited) Tj T*
+() Tj T*
+(Checks whether vertex has already been explored.) Tj T*
+() Tj T*
+(components) Tj T*
+() Tj T*
+(Counts total connected components.) Tj T*
+(Recursive DFS Function) Tj T*
+(def label_dfs\(u, comp_id\):) Tj T*
+() Tj T*
+() Tj T*
+(Parameters) Tj T*
+(u) Tj T*
+() Tj T*
+(Current vertex) Tj T*
+() Tj T*
+(comp_id) Tj T*
+() Tj T*
+(Smallest vertex of component) Tj T*
+() Tj T*
+(Inside function) Tj T*
+(visited[u]=Truelabel[u]=comp_id) Tj T*
+() Tj T*
+() Tj T*
+(Marks vertex visited and assigns label.) Tj T*
+(Finding Connected Components) Tj T*
+(for v in range\(n\):) Tj T*
+() Tj T*
+() Tj T*
+(Starts DFS from the smallest unvisited vertex.) Tj T*
+() Tj T*
+(Example) Tj T*
+(0) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(DFS) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(4) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(DFS) Tj T*
+() Tj T*
+(Produces) Tj T*
+(2 Components) Tj T*
+() Tj T*
+(DFS Traversal) Tj T*
+(dfs_order=[]) Tj T*
+() Tj T*
+() Tj T*
+(Stores DFS visiting order.) Tj T*
+() Tj T*
+(Example) Tj T*
+ET
+endstream
+endobj
+26 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 27 0 R >>
+endobj
+27 0 obj
+<< /Length 831 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(0) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(1) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(3) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(2) Tj T*
+() Tj T*
+(Stored as) Tj T*
+(0 1 3 2) Tj T*
+() Tj T*
+(BFS Variables) Tj T*
+(dist=[]parent=[]queue) Tj T*
+() Tj T*
+() Tj T*
+(Purpose) Tj T*
+() Tj T*
+(dist) Tj T*
+() Tj T*
+(Stores minimum distance from source.) Tj T*
+() Tj T*
+(parent) Tj T*
+() Tj T*
+(Stores previous vertex.) Tj T*
+() Tj T*
+(queue) Tj T*
+() Tj T*
+(Controls BFS order.) Tj T*
+(Distance Array) Tj T*
+(Example) Tj T*
+(Source = 0) Tj T*
+() Tj T*
+(Distance) Tj T*
+(Vertex) Tj T*
+() Tj T*
+(0 1 2 3) Tj T*
+() Tj T*
+(Distance) Tj T*
+() Tj T*
+(0 1 1 2) Tj T*
+() Tj T*
+(Parent Array) Tj T*
+(Example) Tj T*
+(Vertex) Tj T*
+() Tj T*
+(0 1 2 3) Tj T*
+() Tj T*
+(Parent) Tj T*
+() Tj T*
+(-1 0 0 1) Tj T*
+() Tj T*
+(Meaning) Tj T*
+ET
+endstream
+endobj
+28 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 29 0 R >>
+endobj
+29 0 obj
+<< /Length 766 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(3 discovered from 1) Tj T*
+() Tj T*
+(1 discovered from 0) Tj T*
+() Tj T*
+(Route Reconstruction) Tj T*
+(Algorithm) Tj T*
+(Target) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Follow Parent) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Reach Source) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Reverse List) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(Print Path) Tj T*
+() Tj T*
+(Example) Tj T*
+(3) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(1) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(0) Tj T*
+() Tj T*
+(Reverse) Tj T*
+(0 1 3) Tj T*
+() Tj T*
+(Output Section) Tj T*
+(The program prints:) Tj T*
+(COMPONENTS) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(LABELS) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(DFS) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(BFS) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(ROUTE) Tj T*
+() Tj T*
+ET
+endstream
+endobj
+30 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 31 0 R >>
+endobj
+31 0 obj
+<< /Length 1665 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(Exactly in the format required by the assignment specification.) Tj T*
+() Tj T*
+(Time Complexity Analysis) Tj T*
+(The efficiency of the program depends on the graph traversal algorithms used. Both Depth) Tj T*
+(First Search \(DFS\) and Breadth First Search \(BFS\) are efficient graph traversal techniques.) Tj T*
+(1. Building the Graph) Tj T*
+(The program reads all the edges and stores them in an adjacency list.) Tj T*
+(adj[u].append\(v\)adj[v].append\(u\)) Tj T*
+() Tj T*
+() Tj T*
+(There are m edges.) Tj T*
+() Tj T*
+(Time Complexity) Tj T*
+(\\[) Tj T*
+(O\(m\)) Tj T*
+(\\]) Tj T*
+(where) Tj T*
+(- n = Number of vertices) Tj T*
+(- m = Number of edges) Tj T*
+(2. Sorting the Adjacency List) Tj T*
+(Every adjacency list is sorted.) Tj T*
+(for lst in adj:    lst.sort\(\)) Tj T*
+() Tj T*
+() Tj T*
+(Sorting guarantees neighbours are visited in increasing order.) Tj T*
+() Tj T*
+(Worst-case complexity) Tj T*
+(\\[) Tj T*
+(O\(m\\log n\)) Tj T*
+(\\]) Tj T*
+(3. Connected Component DFS) Tj T*
+(Every vertex is visited exactly once.) Tj T*
+() Tj T*
+(Every edge is also visited once.) Tj T*
+() Tj T*
+(Time Complexity) Tj T*
+(\\[) Tj T*
+(O\(n+m\)) Tj T*
+(\\]) Tj T*
+(4. DFS Traversal) Tj T*
+(The DFS traversal starts only from the source vertex.) Tj T*
+() Tj T*
+(Every reachable vertex is visited once.) Tj T*
+() Tj T*
+(Time Complexity) Tj T*
+(\\[) Tj T*
+(O\(n+m\)) Tj T*
+(\\]) Tj T*
+(5. BFS Traversal) Tj T*
+(Breadth First Search also visits every reachable vertex only once.) Tj T*
+() Tj T*
+(Each edge is examined only once.) Tj T*
+() Tj T*
+(Time Complexity) Tj T*
+(\\[) Tj T*
+(O\(n+m\)) Tj T*
+(\\]) Tj T*
+(6. Route Reconstruction) Tj T*
+ET
+endstream
+endobj
+32 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 33 0 R >>
+endobj
+33 0 obj
+<< /Length 1355 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(For every query, the program follows the parent array.) Tj T*
+() Tj T*
+(If the route contains k vertices) Tj T*
+() Tj T*
+(Time Complexity) Tj T*
+(\\[) Tj T*
+(O\(k\)) Tj T*
+(\\]) Tj T*
+(Worst case) Tj T*
+(\\[) Tj T*
+(O\(n\)) Tj T*
+(\\]) Tj T*
+(Overall Time Complexity) Tj T*
+(The complete program executes in) Tj T*
+(\\[) Tj T*
+(O\(m\\log n\)+O\(n+m\)) Tj T*
+(\\]) Tj T*
+(which is commonly written as) Tj T*
+(\\[) Tj T*
+(\\boxed{O\(m\\log n+n+m\)}) Tj T*
+(\\]) Tj T*
+(Since the maximum number of vertices is only 200, the program executes very quickly.) Tj T*
+(Space Complexity) Tj T*
+(The program stores several arrays.) Tj T*
+(Data Structure    Space) Tj T*
+(Adjacency List    O\(n+m\)) Tj T*
+(Visited Array    O\(n\)) Tj T*
+(Label Array    O\(n\)) Tj T*
+(Parent Array    O\(n\)) Tj T*
+(Distance Array    O\(n\)) Tj T*
+(Queue    O\(n\)) Tj T*
+(DFS Order    O\(n\)) Tj T*
+(BFS Order    O\(n\)) Tj T*
+() Tj T*
+() Tj T*
+(Total Space Complexity) Tj T*
+(\\[) Tj T*
+(\\boxed{O\(n+m\)}) Tj T*
+(\\]) Tj T*
+(Test Case 1 \(Original\)) Tj T*
+(Input) Tj T*
+(5 4) Tj T*
+(0 1) Tj T*
+(1 2) Tj T*
+(2 3) Tj T*
+(3 4) Tj T*
+(0 2) Tj T*
+(4) Tj T*
+(2) Tj T*
+() Tj T*
+(Expected Output) Tj T*
+(COMPONENTS 1) Tj T*
+(LABELS 0 0 0 0 0) Tj T*
+(DFS 0 1 2 3 4) Tj T*
+(BFS 0 1 2 3 4) Tj T*
+(ROUTE 4 4 0 1 2 3 4) Tj T*
+(ROUTE 2 2 0 1 2) Tj T*
+() Tj T*
+ET
+endstream
+endobj
+34 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 35 0 R >>
+endobj
+35 0 obj
+<< /Length 1158 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(Explanation) Tj T*
+(All five vertices belong to one connected component.) Tj T*
+() Tj T*
+(DFS visits every vertex recursively.) Tj T*
+() Tj T*
+(BFS finds the shortest route.) Tj T*
+() Tj T*
+(The route to vertex 4 contains four edges.) Tj T*
+(Test Case 2 \(Original\)) Tj T*
+(Input) Tj T*
+(7 4) Tj T*
+(0 1) Tj T*
+(1 2) Tj T*
+(3 4) Tj T*
+(5 6) Tj T*
+(0 3) Tj T*
+(2) Tj T*
+(5) Tj T*
+() Tj T*
+(Expected Output) Tj T*
+(COMPONENTS 3) Tj T*
+(LABELS 0 0 0 3 3 5 5) Tj T*
+(DFS 0 1 2) Tj T*
+(BFS 0 1 2) Tj T*
+(ROUTE 3 UNREACHABLE) Tj T*
+(ROUTE 5 UNREACHABLE) Tj T*
+() Tj T*
+(Explanation) Tj T*
+(The graph contains three connected components.) Tj T*
+(0-1-2) Tj T*
+() Tj T*
+(3-4) Tj T*
+() Tj T*
+(5-6) Tj T*
+() Tj T*
+(Source vertex is 0.) Tj T*
+() Tj T*
+(Vertices 3 and 5 belong to different components.) Tj T*
+() Tj T*
+(Therefore they are unreachable.) Tj T*
+(Test Case 3 \(Original\)) Tj T*
+(Input) Tj T*
+(6 6) Tj T*
+(0 1) Tj T*
+(0 2) Tj T*
+(1 3) Tj T*
+(2 4) Tj T*
+(3 5) Tj T*
+(4 5) Tj T*
+(0 3) Tj T*
+(5) Tj T*
+(4) Tj T*
+(0) Tj T*
+() Tj T*
+(Expected Output) Tj T*
+(COMPONENTS 1) Tj T*
+(LABELS 0 0 0 0 0 0) Tj T*
+(DFS 0 1 3 5 4 2) Tj T*
+ET
+endstream
+endobj
+36 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 37 0 R >>
+endobj
+37 0 obj
+<< /Length 1038 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(BFS 0 1 2 3 4 5) Tj T*
+(ROUTE 5 3 0 1 3 5) Tj T*
+(ROUTE 4 2 0 2 4) Tj T*
+(ROUTE 0 0 0) Tj T*
+() Tj T*
+(Explanation) Tj T*
+(Only one connected component exists.) Tj T*
+() Tj T*
+(DFS explores one branch completely before backtracking.) Tj T*
+() Tj T*
+(BFS explores level by level.) Tj T*
+() Tj T*
+(The shortest path to vertex 5 is) Tj T*
+(0 -> 1 -> 3 -> 5) Tj T*
+() Tj T*
+(Sample Test Case 1) Tj T*
+(Input) Tj T*
+(6 5) Tj T*
+(0 2) Tj T*
+(0 1) Tj T*
+(1 3) Tj T*
+(2 3) Tj T*
+(4 5) Tj T*
+(0 3) Tj T*
+(3) Tj T*
+(5) Tj T*
+(0) Tj T*
+() Tj T*
+(Expected Output) Tj T*
+(COMPONENTS 2) Tj T*
+(LABELS 0 0 0 0 4 4) Tj T*
+(DFS 0 1 3 2) Tj T*
+(BFS 0 1 2 3) Tj T*
+(ROUTE 3 2 0 1 3) Tj T*
+(ROUTE 5 UNREACHABLE) Tj T*
+(ROUTE 0 0 0) Tj T*
+() Tj T*
+(Explanation) Tj T*
+(The graph has two connected components.) Tj T*
+(0-1) Tj T*
+(| |) Tj T*
+(2-3) Tj T*
+() Tj T*
+(4-5) Tj T*
+() Tj T*
+(DFS visits) Tj T*
+(0) Tj T*
+(?) Tj T*
+() Tj T*
+(1) Tj T*
+(?) Tj T*
+() Tj T*
+(3) Tj T*
+(?) Tj T*
+() Tj T*
+(2) Tj T*
+() Tj T*
+(BFS visits) Tj T*
+ET
+endstream
+endobj
+38 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 39 0 R >>
+endobj
+39 0 obj
+<< /Length 2349 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(0) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(1 2) Tj T*
+() Tj T*
+(?) Tj T*
+() Tj T*
+(3) Tj T*
+() Tj T*
+(Vertex 5 belongs to another connected component.) Tj T*
+() Tj T*
+(Therefore it is unreachable.) Tj T*
+(Sample Test Case 2) Tj T*
+(Input) Tj T*
+(3 0) Tj T*
+(1 2) Tj T*
+(1) Tj T*
+(0) Tj T*
+() Tj T*
+(Expected Output) Tj T*
+(COMPONENTS 3) Tj T*
+(LABELS 0 1 2) Tj T*
+(DFS 1) Tj T*
+(BFS 1) Tj T*
+(ROUTE 1 0 1) Tj T*
+(ROUTE 0 UNREACHABLE) Tj T*
+() Tj T*
+(Explanation) Tj T*
+(No edges exist.) Tj T*
+() Tj T*
+(Every vertex forms its own connected component.) Tj T*
+() Tj T*
+(DFS and BFS both visit only the source vertex.) Tj T*
+(Conclusion) Tj T*
+(This project successfully demonstrates the implementation of graph traversal algorithms) Tj T*
+(using Recursive Depth First Search \(DFS\) and Breadth First Search \(BFS\). The program) Tj T*
+(identifies all connected components in the graph, labels each vertex with the smallest) Tj T*
+(vertex number in its connected component, performs deterministic DFS and BFS traversals, and) Tj T*
+(reconstructs minimum-edge routes using the BFS parent array.) Tj T*
+() Tj T*
+(By sorting adjacency lists before traversal, the output remains consistent and reproducible) Tj T*
+(regardless of the order in which edges are provided. The project also highlights the) Tj T*
+(practical use of graphs in representing campus walkways and emergency navigation systems.) Tj T*
+(Overall, the implementation satisfies all the requirements specified in the problem) Tj T*
+(statement while maintaining efficient time and space complexity) Tj T*
+() Tj T*
+(Team Members Contribution) Tj T*
+(Name    Roll Number    Role    Contribution) Tj T*
+(Kanuri Thanush    25MVCAIR0059) Tj T*
+(Team Leader    Led the project, designed the overall algorithm, implemented the Python) Tj T*
+(program using Recursive DFS and BFS, integrated all modules, tested the application with) Tj T*
+(different test cases, analyzed time and space complexity, debugged the code, and prepared) Tj T*
+(the complete project documentation \(CODE-DOC\).) Tj T*
+(Ramagiri Manish    25MVCAIR0069) Tj T*
+(Team Member    Assisted in understanding the problem statement, contributed to testing the) Tj T*
+(program with sample and custom test cases, verified the correctness of outputs, and) Tj T*
+(participated in documentation review.) Tj T*
+ET
+endstream
+endobj
+40 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 41 0 R >>
+endobj
+41 0 obj
+<< /Length 515 >>
+stream
+BT /F1 10 Tf 50 790 Td 13 TL
+(Challa Bharat    25MVCAIR0020) Tj T*
+(Team Member    Assisted in graph analysis, verified DFS and BFS traversal results, helped) Tj T*
+(identify edge cases, and supported testing and validation of the implementation.) Tj T*
+(Devata Sai Nihar    25MVCAIR0030) Tj T*
+(Team Member    Contributed to requirement analysis, checked algorithm flow, assisted in) Tj T*
+(preparing test cases and validating the final outputs, and reviewed the documentation before) Tj T*
+(submission.) Tj T*
+ET
+endstream
+endobj
+xref
+0 42
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000246 00000 n 
+0000000343 00000 n 
+0000000469 00000 n 
+0000003185 00000 n 
+0000003311 00000 n 
+0000004626 00000 n 
+0000004752 00000 n 
+0000005730 00000 n 
+0000005858 00000 n 
+0000007373 00000 n 
+0000007501 00000 n 
+0000008729 00000 n 
+0000008857 00000 n 
+0000009875 00000 n 
+0000010003 00000 n 
+0000011017 00000 n 
+0000011145 00000 n 
+0000012131 00000 n 
+0000012259 00000 n 
+0000013288 00000 n 
+0000013416 00000 n 
+0000014509 00000 n 
+0000014637 00000 n 
+0000015751 00000 n 
+0000015879 00000 n 
+0000016761 00000 n 
+0000016889 00000 n 
+0000017706 00000 n 
+0000017834 00000 n 
+0000019551 00000 n 
+0000019679 00000 n 
+0000021086 00000 n 
+0000021214 00000 n 
+0000022424 00000 n 
+0000022552 00000 n 
+0000023642 00000 n 
+0000023770 00000 n 
+0000026171 00000 n 
+0000026299 00000 n 
+trailer
+<< /Size 42 /Root 1 0 R >>
+startxref
+26865
+%%EOF
